@@ -31,9 +31,9 @@ export const site = {
 
 export const demoScript = [
   { from: "customer", text: "vai wordpress theme ache?" },
-  { from: "sathi", text: "Yes! Blog, eCommerce, portfolio — সব ধরনের আছে 😊 কোন ধরনের সাইট?" },
+  { from: "Autogram", text: "Yes! Blog, eCommerce, portfolio — সব ধরনের আছে 😊 কোন ধরনের সাইট?" },
   { from: "customer", text: "ecommerce. price koto?" },
-  { from: "sathi", text: "eCommerce themes $25 থেকে শুরু। বাজেট বললে সেরাটা দেখাই।" },
+  { from: "Autogram", text: "eCommerce themes $25 থেকে শুরু। বাজেট বললে সেরাটা দেখাই।" },
 ];
 
 // Honest product facts (no fabricated traction, no absolute "0% ban" claims).
