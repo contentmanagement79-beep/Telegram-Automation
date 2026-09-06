@@ -1,9 +1,9 @@
-import { ShieldCheck, Hand, Mic, Lock } from "lucide-react";
+import { ShieldCheck, Hand, Mic, Lock, type LucideIcon } from "lucide-react";
 import { Reveal } from "@/components/ui/reveal";
 import { features } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-const icons: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+const icons: Record<string, LucideIcon> = {
   guardrails: ShieldCheck,
   takeover: Hand,
   media: Mic,
