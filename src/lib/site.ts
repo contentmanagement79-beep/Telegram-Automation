@@ -3,7 +3,7 @@
  * Edit brand, nav, metrics, pricing, faqs, legal here — nowhere else.
  */
 
-export const BRAND = "Sathi";
+export const BRAND = "Autogram";
 export const TAGLINE = "Your business, answered while you sleep.";
 export const CONTACT_EMAIL = "hello@yourdomain.com";
 export const LEGAL_UPDATED = "September 2026";
