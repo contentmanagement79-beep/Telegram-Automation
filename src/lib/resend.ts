@@ -6,7 +6,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 /** Sends the branded verification email via the Resend API. Server only. */
 export async function sendVerificationEmail(to: string, link: string, name?: string) {
-  const from = process.env.EMAIL_FROM || `${BRAND} <onboarding@resend.dev>`;
+  const from = process.env.EMAIL_FROM || `${BRAND} <noreply@linkys.2bd.net>`;
   return resend.emails.send({
     from,
     to,
