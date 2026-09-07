@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { LogOut, Bot, KeyRound, MessageSquare, Package } from "lucide-react";
+import { LogOut, Bot, KeyRound, MessageSquare, Package, MessagesSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
@@ -13,25 +13,21 @@ export default async function DashboardPage() {
 
   const name = (user.user_metadata?.full_name as string) || user.email;
 
-  // connection status
   const { data: tg } = await supabase.from("telegram_accounts").select("status").eq("user_id", user.id).maybeSingle();
-  const { count: keyCount } = await supabase
-    .from("ai_keys").select("id", { count: "exact", head: true })
-    .eq("user_id", user.id).eq("status", "active");
+  const { count: keyCount } = await supabase.from("ai_keys").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "active");
   const { data: persona } = await supabase.from("personas").select("user_id").eq("user_id", user.id).maybeSingle();
 
   const tgConnected = tg?.status === "connected";
   const hasKey = (keyCount ?? 0) > 0;
-  const hasPersona = !!persona;
+  const ready = tgConnected && hasKey;
 
   const cards = [
-    { icon: Bot, title: "Connect Telegram", body: "Link the account the assistant replies from.", href: "/dashboard/connect", ok: tgConnected, okText: "Connected", offText: "Not connected" },
-    { icon: KeyRound, title: "Add your AI key", body: "Your Gemini key powers the replies.", href: "/dashboard/ai-key", ok: hasKey, okText: "Key added", offText: "No key yet" },
-    { icon: MessageSquare, title: "Build the persona", body: "Set tone, topics, prices and limits.", href: "/dashboard/settings", ok: hasPersona, okText: "Configured", offText: "Using defaults" },
-    { icon: Package, title: "Products", body: "Add your catalog so prices stay accurate.", href: "/dashboard/products" },
+    { icon: Bot, title: "Connect Telegram", body: "The account the assistant replies from.", href: "/dashboard/connect", ok: tgConnected, okText: "Connected", offText: "Not connected" },
+    { icon: KeyRound, title: "AI keys", body: "Your Gemini key(s) power the replies.", href: "/dashboard/ai-key", ok: hasKey, okText: "Key added", offText: "No key yet" },
+    { icon: MessageSquare, title: "Build the persona", body: "Tone, topics, prices and limits.", href: "/dashboard/settings", ok: !!persona, okText: "Configured", offText: "Using defaults" },
+    { icon: Package, title: "Products", body: "Your catalog for accurate prices.", href: "/dashboard/products" },
+    { icon: MessagesSquare, title: "Conversations", body: "See what the assistant told customers.", href: "/dashboard/conversations" },
   ];
-
-  const ready = tgConnected && hasKey;
 
   return (
     <section className="dash">
