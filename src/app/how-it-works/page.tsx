@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Shield, Cpu, Zap, CheckCircle2, Lock, Sparkles, Radio } from "lucide-react";
+import { Shield, Cpu, Zap, CheckCircle2, Lock, Sparkles, Radio, Terminal, Bot, MessageSquare } from "lucide-react";
 import { Reveal } from "@/components/ui/reveal";
 import { Cta } from "@/components/sections/cta";
 import { steps, BRAND } from "@/lib/site";
@@ -12,7 +12,7 @@ const icons = [Shield, Cpu, Zap];
 export default function HowItWorksPage() {
   return (
     <>
-      {/* Scoped CSS for the point and step animations */}
+      {/* Scoped CSS for timeline points and rich interactive cards */}
       <style>{`
         @keyframes pulse-ring {
           0% {
@@ -39,9 +39,9 @@ export default function HowItWorksPage() {
           100% { transform: translateY(1000%); opacity: 0; }
         }
 
-        @keyframes shimmer-wave {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
+        @keyframes dot-ping {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.35; transform: scale(1.2); }
         }
 
         .step-num-animated {
@@ -88,14 +88,6 @@ export default function HowItWorksPage() {
           animation: line-glow 4.5s ease-in-out infinite;
         }
 
-        .animated-bar {
-          height: 10px;
-          border-radius: 6px;
-          background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(139,124,248,0.28) 50%, rgba(255,255,255,0.06) 75%);
-          background-size: 200% 100%;
-          animation: shimmer-wave 2.6s linear infinite;
-        }
-
         .step-mockup-badge {
           display: inline-flex;
           align-items: center;
@@ -107,6 +99,111 @@ export default function HowItWorksPage() {
           background: rgba(255, 255, 255, 0.05);
           border: 1px solid var(--line);
           backdrop-filter: blur(8px);
+        }
+
+        /* Card 1: Console / Terminal */
+        .mock-console {
+          background: rgba(6, 7, 12, 0.5);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 12px;
+          padding: 12px 14px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .console-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+        }
+        .console-tag {
+          font-size: 10px;
+          font-weight: 600;
+          padding: 2px 7px;
+          border-radius: 4px;
+        }
+        .tag-pass { background: rgba(61, 220, 151, 0.15); color: var(--mint); }
+        .tag-enc { background: rgba(109, 94, 246, 0.18); color: var(--violet-soft); }
+        .tag-run {
+          background: rgba(56, 189, 248, 0.15);
+          color: var(--sky);
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        /* Card 2: Persona Config */
+        .mock-persona {
+          background: rgba(6, 7, 12, 0.5);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 12px;
+          padding: 12px 14px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          font-size: 13px;
+        }
+        .persona-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+        }
+        .persona-lbl { color: var(--muted); font-size: 12px; }
+        .persona-val { color: var(--text); font-weight: 500; }
+        .persona-chips {
+          display: flex;
+          gap: 6px;
+          flex-wrap: wrap;
+        }
+        .chip {
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 6px;
+          padding: 3px 8px;
+          font-size: 11px;
+          color: var(--violet-soft);
+        }
+
+        /* Card 3: Live Chat Stream */
+        .mock-chat {
+          background: rgba(6, 7, 12, 0.5);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 12px;
+          padding: 12px 14px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          font-size: 13px;
+        }
+        .chat-bubble-mini {
+          padding: 8px 12px;
+          border-radius: 10px;
+          font-size: 12px;
+          line-height: 1.4;
+          max-width: 90%;
+        }
+        .bubble-in {
+          align-self: flex-start;
+          background: rgba(255, 255, 255, 0.06);
+          color: var(--text);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .bubble-out {
+          align-self: flex-end;
+          background: linear-gradient(135deg, rgba(109, 94, 246, 0.35), rgba(168, 85, 247, 0.35));
+          border: 1px solid rgba(109, 94, 246, 0.3);
+          color: #fff;
+        }
+        .live-ping {
+          width: 7px;
+          height: 7px;
+          border-radius: 9999px;
+          background: var(--mint);
+          animation: dot-ping 1.6s ease-in-out infinite;
         }
       `}</style>
 
@@ -150,7 +247,7 @@ export default function HowItWorksPage() {
                     <span>{s.num}</span>
                   </div>
 
-                  {/* Visual Step Card with Animated Status Mockups */}
+                  {/* Visual Step Card with Rich Mockups */}
                   <div className="step-card glass glass-hover">
                     {i === 0 && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -163,9 +260,24 @@ export default function HowItWorksPage() {
                             <Lock size={12} /> AES-256 Encrypted
                           </span>
                         </div>
-                        <div className="animated-bar" style={{ width: "45%" }} />
-                        <div className="animated-bar" style={{ width: "95%" }} />
-                        <div className="animated-bar" style={{ width: "70%", marginBottom: 0 }} />
+
+                        {/* Interactive Terminal Stream */}
+                        <div className="mock-console">
+                          <div className="console-row">
+                            <span style={{ color: "var(--muted)" }}>&gt; API credentials verified</span>
+                            <span className="console-tag tag-pass">READY</span>
+                          </div>
+                          <div className="console-row">
+                            <span style={{ color: "var(--muted)" }}>&gt; Session token encrypted</span>
+                            <span className="console-tag tag-enc">AES-256</span>
+                          </div>
+                          <div className="console-row">
+                            <span style={{ color: "var(--muted)" }}>&gt; Inbound event listener</span>
+                            <span className="console-tag tag-run">
+                              <span className="live-ping" /> ACTIVE
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     )}
 
@@ -173,15 +285,32 @@ export default function HowItWorksPage() {
                       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                           <span className="step-mockup-badge" style={{ color: "var(--violet-soft)" }}>
-                            <Sparkles size={13} /> Gemini 1.5 Pro (BYOK)
+                            <Sparkles size={13} /> Gemini 1.5 (BYOK)
                           </span>
                           <span className="step-mockup-badge" style={{ color: "var(--sky)" }}>
                             <CheckCircle2 size={13} /> Guardrails Locked
                           </span>
                         </div>
-                        <div className="animated-bar" style={{ width: "60%" }} />
-                        <div className="animated-bar" style={{ width: "100%" }} />
-                        <div className="animated-bar" style={{ width: "80%", marginBottom: 0 }} />
+
+                        {/* Interactive Persona Card */}
+                        <div className="mock-persona">
+                          <div className="persona-item">
+                            <span className="persona-lbl">Tone:</span>
+                            <span className="persona-val" style={{ color: "var(--violet-soft)" }}>Warm Banglish &amp; English</span>
+                          </div>
+                          <div className="persona-item">
+                            <span className="persona-lbl">Guardrails:</span>
+                            <span className="persona-val" style={{ fontSize: 12, color: "var(--mint)" }}>Strict Catalog Price Lock</span>
+                          </div>
+                          <div className="persona-item" style={{ paddingTop: 4, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                            <span className="persona-lbl">Supports:</span>
+                            <div className="persona-chips">
+                              <span className="chip">Voice Notes</span>
+                              <span className="chip">Photos/Vision</span>
+                              <span className="chip">PDF Docs</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     )}
 
@@ -189,15 +318,27 @@ export default function HowItWorksPage() {
                       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                           <span className="step-mockup-badge" style={{ color: "var(--mint)" }}>
-                            <Radio size={13} className="rec-icon" /> 24/7 Live Monitoring
+                            <Radio size={13} className="rec-icon" /> 24/7 Live Answering
                           </span>
-                          <span style={{ fontSize: 12, fontFamily: "monospace", color: "var(--iris)", background: "rgba(168,85,247,0.12)", padding: "2px 8px", borderRadius: 6, border: "1px solid rgba(168,85,247,0.25)" }}>
-                            //stop
+                          <span style={{ fontSize: 11, fontFamily: "monospace", color: "var(--iris)", background: "rgba(168,85,247,0.12)", padding: "3px 10px", borderRadius: 6, border: "1px solid rgba(168,85,247,0.25)" }}>
+                            //stop to take over
                           </span>
                         </div>
-                        <div className="animated-bar" style={{ width: "40%" }} />
-                        <div className="animated-bar" style={{ width: "88%" }} />
-                        <div className="animated-bar" style={{ width: "55%", marginBottom: 0 }} />
+
+                        {/* Interactive Live Dialogue Stream */}
+                        <div className="mock-chat">
+                          <div className="chat-bubble-mini bubble-in">
+                            <span style={{ fontSize: 10, color: "var(--muted)", display: "block", marginBottom: 2 }}>Customer</span>
+                            Hi! Template er price koto?
+                          </div>
+                          <div className="chat-bubble-mini bubble-out">
+                            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.7)", display: "block", marginBottom: 2 }}>Assistant (0.6s)</span>
+                            Hey! $49, instant download link pathiye dicchi 👇
+                          </div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--mint)", marginTop: 2 }}>
+                            <span className="live-ping" /> Auto-reply dispatched
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
