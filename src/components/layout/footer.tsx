@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Bot } from "lucide-react";
 import { site } from "@/lib/site";
+import { FooterAuthLink } from "@/components/sections/footer-auth-link";
 
 export function Footer() {
   return (
@@ -19,7 +20,7 @@ export function Footer() {
             {[...site.nav, ...site.legalNav].map((item) => (
               <Link key={item.href} href={item.href}>{item.label}</Link>
             ))}
-            <Link href={site.links.login}>Sign in</Link>
+            <FooterAuthLink />
           </nav>
         </div>
 
