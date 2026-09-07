@@ -7,7 +7,9 @@ import { cn } from "@/lib/utils";
 
 type Item = (typeof demoScript)[number] & { id: number; time: string };
 
-const BARS =;
+const BARS = "0.4,0.7,0.5,0.9,0.6,1.0,0.55,0.8,0.45,0.75,0.5,0.95,0.6,0.85,0.5,0.7,0.4,0.65"
+  .split(",")
+  .map(Number);
 
 export function ChatDemo() {
   const [shown, setShown] = useState<Item[]>([]);
