@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, RefreshCw } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +14,9 @@ export default function ConversationsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
+    let active = true;
+
+    async function load() {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -24,8 +26,8 @@ export default function ConversationsPage() {
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(400);
+      if (!active) return;
       const rows = (data as Msg[]) ?? [];
-      // group by customer, keep customer order by latest activity (rows are desc)
       const order: number[] = [];
       const map = new Map<number, Msg[]>();
       for (const r of rows) {
@@ -34,14 +36,25 @@ export default function ConversationsPage() {
       }
       setGroups(order.map((id) => ({ customer_id: id, messages: map.get(id)!.slice().reverse() })));
       setLoading(false);
-    })();
+    }
+
+    load();
+    const iv = setInterval(load, 5000); // realtime-ish: refresh every 5s
+    return () => { active = false; clearInterval(iv); };
   }, []);
 
   return (
     <section className="dash">
       <Link href="/dashboard" className="back-link"><ChevronLeft size={16} /> Back to dashboard</Link>
-      <h1 className="dash-title">Conversations</h1>
-      <p className="muted" style={{ marginTop: 8 }}>What your assistant said to each customer. Raw messages are kept for about 7 days.</p>
+      <div className="dash-head">
+        <div>
+          <h1 className="dash-title">Conversations</h1>
+          <p className="muted" style={{ marginTop: 8 }}>What your assistant said to each customer. Updates live. Raw messages kept ~7 days.</p>
+        </div>
+        <span className="muted" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13 }}>
+          <RefreshCw size={13} /> live
+        </span>
+      </div>
 
       <div style={{ marginTop: 28 }}>
         {loading ? (
