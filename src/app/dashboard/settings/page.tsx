@@ -23,6 +23,11 @@ type PersonaForm = {
   cmd_global_stop: string;
   cmd_global_start: string;
   tone_config: Tone;
+  hours_enabled: boolean;
+  hours_start: number;
+  hours_end: number;
+  tz_offset: number;
+  away_message: string;
 };
 
 const DEFAULTS: PersonaForm = {
@@ -40,6 +45,11 @@ const DEFAULTS: PersonaForm = {
   cmd_global_stop: "//stopall",
   cmd_global_start: "//startall",
   tone_config: { formality: "balanced", emoji: "light", language: "auto", length: "medium" },
+  hours_enabled: false,
+  hours_start: 9,
+  hours_end: 22,
+  tz_offset: 6,
+  away_message: "",
 };
 
 export default function SettingsPage() {
@@ -141,6 +151,22 @@ export default function SettingsPage() {
             <Field label="Pause everything" value={form.cmd_global_stop} onChange={(e) => set("cmd_global_stop", e.target.value)} />
             <Field label="Resume everything" value={form.cmd_global_start} onChange={(e) => set("cmd_global_start", e.target.value)} />
           </div>
+        </div>
+
+        <div className="panel glass">
+          <p className="panel-title">Business hours</p>
+          <p className="panel-desc">Optional. Reply only during set hours; outside them, send an away message.</p>
+          <Toggle label="Enable business hours" desc="When off, the bot replies 24/7." on={form.hours_enabled} onToggle={() => set("hours_enabled", !form.hours_enabled)} />
+          {form.hours_enabled && (
+            <>
+              <div className="form-grid" style={{ marginTop: 12 }}>
+                <label style={{ display: "block" }}><span className="field-label">Active from (hour 0–23)</span><input className="field-input" type="number" min={0} max={23} value={form.hours_start} onChange={(e) => set("hours_start", Number(e.target.value))} /></label>
+                <label style={{ display: "block" }}><span className="field-label">Active until (hour 0–23)</span><input className="field-input" type="number" min={0} max={23} value={form.hours_end} onChange={(e) => set("hours_end", Number(e.target.value))} /></label>
+              </div>
+              <label style={{ display: "block", marginTop: 16 }}><span className="field-label">Timezone offset from UTC (Bangladesh = 6)</span><input className="field-input" type="number" value={form.tz_offset} onChange={(e) => set("tz_offset", Number(e.target.value))} /></label>
+              <Textarea label="Away message (outside hours)" value={form.away_message} onChange={(v) => set("away_message", v)} placeholder="Thanks! We're offline right now — we'll reply during business hours 🙂" />
+            </>
+          )}
         </div>
 
         <div className="panel glass">
