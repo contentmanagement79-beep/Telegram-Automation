@@ -13,11 +13,11 @@ export default async function DashboardPage() {
 
   const name = (user.user_metadata?.full_name as string) || user.email;
 
-  const { data: tg } = await supabase.from("telegram_accounts").select("status").eq("user_id", user.id).maybeSingle();
+  const { data: tgRows } = await supabase.from("telegram_accounts").select("status").eq("user_id", user.id).eq("status", "connected");
   const { count: keyCount } = await supabase.from("ai_keys").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "active");
   const { data: persona } = await supabase.from("personas").select("user_id").eq("user_id", user.id).maybeSingle();
 
-  const tgConnected = tg?.status === "connected";
+  const tgConnected = (tgRows?.length ?? 0) > 0;
   const hasKey = (keyCount ?? 0) > 0;
   const ready = tgConnected && hasKey;
 
