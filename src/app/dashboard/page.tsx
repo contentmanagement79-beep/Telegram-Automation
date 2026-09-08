@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { LogOut, Bot, KeyRound, MessageSquare, Package, MessagesSquare, Plug } from "lucide-react";
+import { LogOut, Bot, KeyRound, MessageSquare, Package, MessagesSquare, Plug, Images, Clock } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
@@ -26,7 +26,9 @@ export default async function DashboardPage() {
     { icon: KeyRound, title: "AI keys", body: "Your Gemini key(s) power the replies.", href: "/dashboard/ai-key", ok: hasKey, okText: "Key added", offText: "No key yet" },
     { icon: MessageSquare, title: "Build the persona", body: "Tone, topics, prices and limits.", href: "/dashboard/settings", ok: !!persona, okText: "Configured", offText: "Using defaults" },
     { icon: Package, title: "Products", body: "Your catalog for accurate prices.", href: "/dashboard/products" },
+    { icon: Images, title: "Media library", body: "Photos/videos the bot can send (blur/spoiler).", href: "/dashboard/media" },
     { icon: MessagesSquare, title: "Conversations", body: "See what the assistant told customers.", href: "/dashboard/conversations" },
+    { icon: Clock, title: "Follow-ups", body: "Auto-message customers who go quiet.", href: "/dashboard/followups" },
     { icon: Plug, title: "Website / API", body: "Pull live stock & prices from your own site.", href: "/dashboard/integration" },
   ];
 
