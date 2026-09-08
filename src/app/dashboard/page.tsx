@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { LogOut, Bot, KeyRound, MessageSquare, Package, MessagesSquare } from "lucide-react";
+import { LogOut, Bot, KeyRound, MessageSquare, Package, MessagesSquare, Plug } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +27,7 @@ export default async function DashboardPage() {
     { icon: MessageSquare, title: "Build the persona", body: "Tone, topics, prices and limits.", href: "/dashboard/settings", ok: !!persona, okText: "Configured", offText: "Using defaults" },
     { icon: Package, title: "Products", body: "Your catalog for accurate prices.", href: "/dashboard/products" },
     { icon: MessagesSquare, title: "Conversations", body: "See what the assistant told customers.", href: "/dashboard/conversations" },
+    { icon: Plug, title: "Website / API", body: "Pull live stock & prices from your own site.", href: "/dashboard/integration" },
   ];
 
   return (
