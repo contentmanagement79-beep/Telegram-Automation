@@ -25,6 +25,10 @@ export async function POST(req: NextRequest) {
         user_id: body.user_id, plan: body.plan === "pro" ? "pro" : "free",
         expires_at: body.expires_at || null, updated_at: new Date().toISOString(),
       });
+    } else if (body.type === "suspend") {
+      await svc.from("plans").upsert({
+        user_id: body.user_id, suspended: !!body.suspended, updated_at: new Date().toISOString(),
+      });
     } else if (body.type === "paysettings") {
       await svc.from("platform_settings").update({
         price_text: body.price_text ?? "", pay_number: body.pay_number ?? "",
