@@ -20,7 +20,7 @@ export default async function DashboardPage() {
     supabase.from("personas").select("user_id").eq("user_id", user.id).maybeSingle(),
     supabase.from("platform_settings").select("monetization_on").eq("id", 1).maybeSingle(),
     supabase.from("feature_flags").select("key,tier"),
-    supabase.from("plans").select("plan,expires_at").eq("user_id", user.id).maybeSingle(),
+    supabase.from("plans").select("plan,expires_at,suspended").eq("user_id", user.id).maybeSingle(),
   ]);
 
   const tgConnected = (tgRows.data?.length ?? 0) > 0;
@@ -28,6 +28,20 @@ export default async function DashboardPage() {
   const ready = tgConnected && hasKey;
 
   const mon = settingsRes.data?.monetization_on ?? false;
+
+  if (planRes.data?.suspended) {
+    return (
+      <section className="dash" style={{ maxWidth: "40rem" }}>
+        <div className="panel glass" style={{ marginTop: 40, textAlign: "center" }}>
+          <h1 className="dash-title" style={{ marginBottom: 12 }}>Account suspended</h1>
+          <p className="muted">Your account has been suspended and your assistant is paused. Please contact support if you think this is a mistake.</p>
+          <form action="/auth/signout" method="post" style={{ marginTop: 20 }}>
+            <button className="btn btn-outline btn-sm" type="submit"><LogOut size={16} /> Sign out</button>
+          </form>
+        </div>
+      </section>
+    );
+  }
   const flagMap = new Map((flagsRes.data ?? []).map((f) => [f.key, f.tier]));
   const plan = planRes.data;
   const isPro = !!plan && plan.plan === "pro" && (!plan.expires_at || new Date(plan.expires_at) > new Date());
