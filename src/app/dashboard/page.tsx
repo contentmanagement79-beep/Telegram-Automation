@@ -68,7 +68,7 @@ export default async function DashboardPage() {
         {cards.map((c) => {
           const isLocked = locked(c.feature);
           return (
-            <Link key={c.title} href={isLocked ? "#" : c.href} className="dash-card glass glass-hover" style={{ opacity: isLocked ? 0.7 : 1 }}>
+            <Link key={c.title} href={isLocked ? "/dashboard/upgrade" : c.href} className="dash-card glass glass-hover" style={{ opacity: isLocked ? 0.7 : 1 }}>
               <span className="dash-ico"><c.icon size={20} /></span>
               <h3 style={{ marginTop: 20, fontSize: 18 }}>{c.title}</h3>
               <p className="muted" style={{ marginTop: 8, fontSize: 14 }}>{c.body}</p>
