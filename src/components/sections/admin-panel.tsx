@@ -7,7 +7,10 @@ import { Field } from "@/components/sections/auth-card";
 import { cn } from "@/lib/utils";
 
 type Flag = { key: string; tier: string };
-type Row = { id: string; email: string | null; plan: string; expires_at: string | null };
+type Row = {
+  id: string; email: string | null; plan: string; expires_at: string | null; suspended: boolean;
+  customers: number; messages: number; last_active: string | null; connections: string[];
+};
 type Req = { id: string; user_id: string; email: string; method: string; trx_id: string; status: string; created_at: string };
 type Pay = { price_text: string; pay_number: string; pay_instructions: string; pro_days: number };
 
@@ -113,13 +116,26 @@ export function AdminPanel() {
       <div className="panel glass">
         <p className="panel-title">Users {users.length > 0 && <span className="muted" style={{ fontSize: 14, fontWeight: 400 }}>· {users.length}</span>}</p>
         {users.map((u) => (
-          <div key={u.id} className="key-row">
-            <div><div>{u.email || u.id.slice(0, 8)}</div><div className="prod-meta">plan: {u.plan}{u.expires_at ? ` · until ${new Date(u.expires_at).toLocaleDateString()}` : ""}</div></div>
-            <div style={{ display: "flex", gap: 6 }}>
+          <div key={u.id} className="key-row" style={{ flexWrap: "wrap", rowGap: 10 }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                {u.email || u.id.slice(0, 8)}
+                {u.suspended && <span className="badge badge-off" style={{ fontSize: 11 }}>suspended</span>}
+                {u.connections.length > 0 && <span className="badge badge-ok" style={{ fontSize: 11 }}>{u.connections.join(" + ")}</span>}
+              </div>
+              <div className="prod-meta">
+                {u.customers} customers · {u.messages} msgs · {u.last_active ? `active ${new Date(u.last_active).toLocaleDateString()}` : "no activity"} · plan: {u.plan}
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               {["free", "pro"].map((p) => (
                 <button key={p} onClick={() => { setUsers((x) => x.map((y) => y.id === u.id ? { ...y, plan: p } : y)); post({ type: "plan", user_id: u.id, plan: p, expires_at: u.expires_at }); }}
-                  className={cn("btn btn-sm", u.plan === p ? "btn-primary" : "btn-outline")} style={{ minWidth: 56 }}>{p}</button>
+                  className={cn("btn btn-sm", u.plan === p ? "btn-primary" : "btn-outline")} style={{ minWidth: 52 }}>{p}</button>
               ))}
+              <button onClick={() => { const v = !u.suspended; setUsers((x) => x.map((y) => y.id === u.id ? { ...y, suspended: v } : y)); post({ type: "suspend", user_id: u.id, suspended: v }); }}
+                className={cn("btn btn-sm", u.suspended ? "btn-primary" : "btn-outline")} style={{ minWidth: 80 }}>
+                {u.suspended ? "Activate" : "Suspend"}
+              </button>
             </div>
           </div>
         ))}
