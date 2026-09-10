@@ -14,7 +14,7 @@ export async function GET() {
 
   const svc = serviceClient();
   const [settings, flags, plans, usersRes, reqs, customers, tg, convos] = await Promise.all([
-    svc.from("platform_settings").select("monetization_on,price_text,pay_number,pay_instructions,pro_days").eq("id", 1).maybeSingle(),
+    svc.from("platform_settings").select("monetization_on,price_text,pay_number,pay_instructions,pro_days,managed_ai_on").eq("id", 1).maybeSingle(),
     svc.from("feature_flags").select("key,tier"),
     svc.from("plans").select("user_id,plan,expires_at,suspended"),
     svc.auth.admin.listUsers(),
@@ -22,6 +22,7 @@ export async function GET() {
     svc.from("customers").select("user_id,last_msg_at").limit(20000),
     svc.from("telegram_accounts").select("user_id,mode,status"),
     svc.from("conversations").select("user_id").limit(20000),
+    svc.from("platform_ai_keys").select("id,hint,status").order("created_at"),
   ]);
 
   const planMap = new Map((plans.data ?? []).map((p) => [p.user_id, p]));
@@ -62,6 +63,8 @@ export async function GET() {
   const s = settings.data;
   return NextResponse.json({
     monetization_on: s?.monetization_on ?? false,
+    managed_ai_on: s?.managed_ai_on ?? false,
+    platform_keys: (platKeys.data ?? []).map((k) => ({ id: k.id, hint: k.hint, status: k.status })),
     paysettings: { price_text: s?.price_text ?? "", pay_number: s?.pay_number ?? "", pay_instructions: s?.pay_instructions ?? "", pro_days: s?.pro_days ?? 30 },
     flags: flags.data ?? [],
     users,
