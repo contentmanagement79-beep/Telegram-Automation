@@ -13,7 +13,9 @@ export async function GET() {
   }
 
   const svc = serviceClient();
-  const [settings, flags, plans, usersRes, reqs, customers, tg, convos] = await Promise.all([
+  
+  // এখানে শেষে platKeys যুক্ত করা হয়েছে
+  const [settings, flags, plans, usersRes, reqs, customers, tg, convos, platKeys] = await Promise.all([
     svc.from("platform_settings").select("monetization_on,price_text,pay_number,pay_instructions,pro_days,managed_ai_on").eq("id", 1).maybeSingle(),
     svc.from("feature_flags").select("key,tier"),
     svc.from("plans").select("user_id,plan,expires_at,suspended"),
@@ -64,7 +66,7 @@ export async function GET() {
   return NextResponse.json({
     monetization_on: s?.monetization_on ?? false,
     managed_ai_on: s?.managed_ai_on ?? false,
-    platform_keys: (platKeys.data ?? []).map((k) => ({ id: k.id, hint: k.hint, status: k.status })),
+    platform_keys: (platKeys.data ?? []).map((k: any) => ({ id: k.id, hint: k.hint, status: k.status })), // টাইপ এরর এড়াতে k: any দিতে পারেন বা প্রপার ইন্টারফেস ব্যবহার করতে পারেন
     paysettings: { price_text: s?.price_text ?? "", pay_number: s?.pay_number ?? "", pay_instructions: s?.pay_instructions ?? "", pro_days: s?.pro_days ?? 30 },
     flags: flags.data ?? [],
     users,
