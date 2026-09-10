@@ -100,6 +100,40 @@ Content-Type: application/json
           <strong> &quot;Test endpoint&quot;</strong> to confirm it works before going live. If you have no site/DB,
           you can instead add products manually in Dashboard → Products.
         </p>
+
+        <div className="doc-warn">
+          <p><strong>⚠️ Important: use partial / keyword search, not exact match.</strong></p>
+          <p className="muted" style={{ marginTop: 6 }}>
+            Autogram sends the customer&apos;s whole sentence as <span className="mono">query</span> (e.g.
+            <span className="mono"> &quot;do you have a video editing course?&quot;</span>). If your endpoint does an
+            exact/whole-string match, it will wrongly say &quot;not found&quot; even when you have 3 video-editing
+            courses. Split the query into keywords, drop filler words, and match if <em>any</em> keyword appears
+            in a product&apos;s name/category/tags.
+          </p>
+          <pre className="doc-code">{`const q = (req.body.query || "").toLowerCase();
+
+// 1) drop filler/stop words, keep real keywords
+const stop = ["do","you","have","any","is","there","a","the","course",
+              "ase","naki","ki","ache","কি","আছে","কোর্স","নাকি"];
+const words = q.split(/[\\s,?!।]+/).filter(w => w && !stop.includes(w));
+
+// 2) partial (contains) match on name/category/tags — ANY keyword hits
+const all = await db.products.find({});
+const items = all.filter(p => {
+  const hay = (p.name + " " + p.category + " " + (p.tags||[]).join(" ")).toLowerCase();
+  return words.some(w => hay.includes(w));
+});
+
+// 3) return matches (or a clear "not found")
+res.json({ context: items.length
+  ? items.slice(0,5).map(p => \`\${p.name} — \${p.price}৳ — \${p.summary}\`).join(" | ")
+  : "No matching course found." });`}</pre>
+          <p className="muted" style={{ marginTop: 6 }}>
+            Even better: match by <strong>category</strong> (return all &quot;video editing&quot; courses), and add
+            fuzzy matching (<span className="mono">fuse.js</span> / <span className="mono">rapidfuzz</span>) to
+            handle typos.
+          </p>
+        </div>
       </div>
 
       {/* CONTACT */}
