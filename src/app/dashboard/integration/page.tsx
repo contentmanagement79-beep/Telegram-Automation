@@ -18,6 +18,9 @@ export default function IntegrationPage() {
   const [enabled, setEnabled] = useState(false);
   const [desc, setDesc] = useState("");
   const [hasSecret, setHasSecret] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testQ, setTestQ] = useState("Do you have any courses?");
+  const [testRes, setTestRes] = useState<{ ok: boolean; text: string } | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -51,6 +54,21 @@ export default function IntegrationPage() {
     if (headerValue) setHasSecret(true);
     setHeaderValue("");
     setNote({ ok: true, msg: "Saved." });
+  }
+
+  async function runTest() {
+    setTestRes(null); setTesting(true);
+    try {
+      const res = await fetch("/api/integration/test", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: testQ }),
+      });
+      const data = await res.json();
+      setTestRes(data.ok ? { ok: true, text: data.result } : { ok: false, text: data.error || "Test failed." });
+    } catch {
+      setTestRes({ ok: false, text: "Could not reach the engine." });
+    }
+    setTesting(false);
   }
 
   if (loading) return <section className="dash"><p className="muted">Loading…</p></section>;
@@ -103,6 +121,24 @@ export default function IntegrationPage() {
           <button className="btn btn-primary" onClick={save} disabled={saving}>{saving ? "Saving…" : "Save"}</button>
           {note && <span className={cn("save-note", note.ok ? "ok" : "err")}>{note.msg}</span>}
         </div>
+      </div>
+
+      <div className="panel glass">
+        <p className="panel-title">Test your endpoint</p>
+        <p className="panel-desc">Send a sample question to your saved API — exactly like the bot does — and see what comes back.</p>
+        <label style={{ display: "block" }}>
+          <span className="field-label">Sample customer question</span>
+          <input className="field-input" value={testQ} onChange={(e) => setTestQ(e.target.value)} />
+        </label>
+        <div className="save-bar">
+          <button className="btn btn-outline btn-sm" onClick={runTest} disabled={testing}>{testing ? "Testing…" : "Test endpoint"}</button>
+        </div>
+        {testRes && (
+          <div style={{ marginTop: 12 }}>
+            <span className={cn("badge", testRes.ok ? "badge-ok" : "badge-off")}>{testRes.ok ? "Working ✓" : "Problem"}</span>
+            <pre style={{ marginTop: 10, whiteSpace: "pre-wrap", wordBreak: "break-word", background: "var(--white-05)", border: "1px solid var(--line)", borderRadius: 10, padding: 12, fontSize: 13 }}>{testRes.text}</pre>
+          </div>
+        )}
       </div>
     </section>
   );
