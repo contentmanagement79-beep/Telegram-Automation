@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isAdminEmail, serviceClient } from "@/lib/admin";
+import { callEngine } from "@/lib/engine";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -44,6 +45,13 @@ export async function POST(req: NextRequest) {
       } else {
         await svc.from("subscription_requests").update({ status: "rejected" }).eq("id", body.request_id);
       }
+    } else if (body.type === "managed_ai") {
+      await svc.from("platform_settings").update({ managed_ai_on: !!body.managed_ai_on }).eq("id", 1);
+    } else if (body.type === "platform_key_add") {
+      const r = await callEngine("/internal/platform-ai-key", { key: body.key });
+      if (!r.ok) return NextResponse.json(r.data, { status: 400 });
+    } else if (body.type === "platform_key_del") {
+      await svc.from("platform_ai_keys").delete().eq("id", body.id);
     } else {
       return NextResponse.json({ error: "bad type" }, { status: 400 });
     }
