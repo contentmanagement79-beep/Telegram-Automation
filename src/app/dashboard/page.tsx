@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { LogOut, Bot, KeyRound, MessageSquare, Package, MessagesSquare, Plug, Images, Clock, Users, Lock, Shield } from "lucide-react";
+import { LogOut, Bot, KeyRound, MessageSquare, Package, MessagesSquare, Plug, Images, Clock, Users, Lock, Shield, Mic } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { isAdminEmail } from "@/lib/admin";
 import { cn } from "@/lib/utils";
@@ -53,6 +53,7 @@ export default async function DashboardPage() {
     { icon: MessageSquare, title: "Build the persona", body: "Tone, topics, prices, hours.", href: "/dashboard/settings", ok: !!personaRes.data, okText: "Configured", offText: "Defaults" },
     { icon: Package, title: "Products", body: "Your catalog for accurate prices.", href: "/dashboard/products" },
     { icon: Images, title: "Media library", body: "Photos/videos the bot can send.", href: "/dashboard/media", feature: "media" },
+    { icon: Mic, title: "Voice", body: "Premium voice (ElevenLabs / any API).", href: "/dashboard/voice", feature: "voice" },
     { icon: MessagesSquare, title: "Conversations", body: "What the assistant told customers.", href: "/dashboard/conversations", feature: "conversations" },
     { icon: Users, title: "Customers", body: "Everyone who messaged + summary.", href: "/dashboard/customers", feature: "customers" },
     { icon: Clock, title: "Follow-ups", body: "Auto-message quiet customers.", href: "/dashboard/followups", feature: "followups" },
