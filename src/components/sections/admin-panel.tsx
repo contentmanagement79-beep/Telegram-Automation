@@ -26,6 +26,9 @@ export function AdminPanel() {
   const [managedAi, setManagedAi] = useState(false);
   const [platKeys, setPlatKeys] = useState<{ id: string; hint: string | null; status: string }[]>([]);
   const [newKey, setNewKey] = useState("");
+  const [managedVoice, setManagedVoice] = useState(false);
+  const [voiceProvs, setVoiceProvs] = useState<{ id: string; name: string | null; endpoint: string }[]>([]);
+  const [vp, setVp] = useState({ name: "", endpoint: "", header_name: "", header_value: "", body_template: '{"text":"{text}"}', voice: "", response_type: "audio", json_path: "" });
   const [flags, setFlags] = useState<Flag[]>([]);
   const [users, setUsers] = useState<Row[]>([]);
   const [reqs, setReqs] = useState<Req[]>([]);
@@ -38,6 +41,7 @@ export function AdminPanel() {
     const d = await res.json();
     setMon(d.monetization_on); setFlags(d.flags); setUsers(d.users); setReqs(d.requests); setPay(d.paysettings);
     setManagedAi(d.managed_ai_on); setPlatKeys(d.platform_keys ?? []);
+    setManagedVoice(d.managed_voice_on); setVoiceProvs(d.voice_providers ?? []);
     setLoading(false);
   }
   useEffect(() => { load(); }, []);
@@ -137,6 +141,45 @@ export function AdminPanel() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* managed voice */}
+      <div className="panel glass">
+        <div className="switch-row" style={{ borderTop: 0 }}>
+          <div>
+            <div style={{ fontSize: 16 }}>Managed Voice</div>
+            <div className="muted" style={{ fontSize: 13, marginTop: 2 }}>When ON, Pro users without their own voice provider use the platform provider below.</div>
+          </div>
+          <button className={cn("switch", managedVoice && "on")} onClick={() => { const v = !managedVoice; setManagedVoice(v); post({ type: "managed_voice", managed_voice_on: v }); }}><span className="switch-knob" /></button>
+        </div>
+        <p className="panel-desc" style={{ marginTop: 12 }}>Add a platform voice provider (e.g. ElevenLabs). Endpoint may use {"{voice}"}; body uses {"{text}"}.</p>
+        <div className="form-grid">
+          <input className="field-input" value={vp.name} onChange={(e) => setVp({ ...vp, name: e.target.value })} placeholder="Name (ElevenLabs)" />
+          <input className="field-input" value={vp.voice} onChange={(e) => setVp({ ...vp, voice: e.target.value })} placeholder="Voice id" />
+        </div>
+        <input className="field-input" style={{ marginTop: 10 }} value={vp.endpoint} onChange={(e) => setVp({ ...vp, endpoint: e.target.value })} placeholder="https://api.elevenlabs.io/v1/text-to-speech/{voice}" />
+        <div className="form-grid" style={{ marginTop: 10 }}>
+          <input className="field-input" value={vp.header_name} onChange={(e) => setVp({ ...vp, header_name: e.target.value })} placeholder="Header name (xi-api-key)" />
+          <input className="field-input" type="password" value={vp.header_value} onChange={(e) => setVp({ ...vp, header_value: e.target.value })} placeholder="Header value (secret)" />
+        </div>
+        <textarea className="field-textarea" style={{ marginTop: 10 }} value={vp.body_template} onChange={(e) => setVp({ ...vp, body_template: e.target.value })} placeholder='{"text":"{text}"}' />
+        <div className="form-grid" style={{ marginTop: 10 }}>
+          <select className="field-select" value={vp.response_type} onChange={(e) => setVp({ ...vp, response_type: e.target.value })}>
+            <option value="audio">audio</option><option value="base64">base64</option><option value="url">url</option>
+          </select>
+          <input className="field-input" value={vp.json_path} onChange={(e) => setVp({ ...vp, json_path: e.target.value })} placeholder="JSON path (base64/url)" />
+        </div>
+        <div className="save-bar">
+          <button className="btn btn-primary btn-sm" onClick={async () => { if (!vp.endpoint.trim()) return; await post({ type: "voice_provider_add", provider: vp }, true); setVp({ ...vp, name: "", endpoint: "", header_value: "", voice: "" }); }}>Add provider</button>
+        </div>
+        <div style={{ marginTop: 12 }}>
+          {voiceProvs.length === 0 ? <p className="empty">No platform voice provider.</p> : voiceProvs.map((v) => (
+            <div key={v.id} className="key-row">
+              <div><div className="prod-name">{v.name || "Voice provider"}</div><div className="prod-meta">{v.endpoint}</div></div>
+              <button className="icon-btn" onClick={() => post({ type: "voice_provider_del", id: v.id }, true)}>✕</button>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* users */}
