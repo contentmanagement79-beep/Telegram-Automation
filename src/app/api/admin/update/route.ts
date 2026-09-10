@@ -52,6 +52,13 @@ export async function POST(req: NextRequest) {
       if (!r.ok) return NextResponse.json(r.data, { status: 400 });
     } else if (body.type === "platform_key_del") {
       await svc.from("platform_ai_keys").delete().eq("id", body.id);
+    } else if (body.type === "managed_voice") {
+      await svc.from("platform_settings").update({ managed_voice_on: !!body.managed_voice_on }).eq("id", 1);
+    } else if (body.type === "voice_provider_add") {
+      const r = await callEngine("/internal/voice-provider", { ...body.provider, scope: "platform" });
+      if (!r.ok) return NextResponse.json(r.data, { status: 400 });
+    } else if (body.type === "voice_provider_del") {
+      await svc.from("voice_providers").delete().eq("id", body.id).eq("scope", "platform");
     } else {
       return NextResponse.json({ error: "bad type" }, { status: 400 });
     }
