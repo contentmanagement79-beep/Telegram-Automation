@@ -23,6 +23,9 @@ const FEATURE_LABELS: Record<string, string> = {
 export function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [mon, setMon] = useState(false);
+  const [managedAi, setManagedAi] = useState(false);
+  const [platKeys, setPlatKeys] = useState<{ id: string; hint: string | null; status: string }[]>([]);
+  const [newKey, setNewKey] = useState("");
   const [flags, setFlags] = useState<Flag[]>([]);
   const [users, setUsers] = useState<Row[]>([]);
   const [reqs, setReqs] = useState<Req[]>([]);
@@ -34,6 +37,7 @@ export function AdminPanel() {
     if (!res.ok) { setNote("Not authorized."); setLoading(false); return; }
     const d = await res.json();
     setMon(d.monetization_on); setFlags(d.flags); setUsers(d.users); setReqs(d.requests); setPay(d.paysettings);
+    setManagedAi(d.managed_ai_on); setPlatKeys(d.platform_keys ?? []);
     setLoading(false);
   }
   useEffect(() => { load(); }, []);
@@ -93,6 +97,29 @@ export function AdminPanel() {
           <input className="field-input" type="number" value={pay.pro_days} onChange={(e) => setPay({ ...pay, pro_days: Number(e.target.value) })} />
         </label>
         <div className="save-bar"><button className="btn btn-outline btn-sm" onClick={() => post({ type: "paysettings", ...pay })}>Save payment settings</button></div>
+      </div>
+
+      {/* managed AI keys */}
+      <div className="panel glass">
+        <div className="switch-row" style={{ borderTop: 0 }}>
+          <div>
+            <div style={{ fontSize: 16 }}>Managed AI key (Gemini)</div>
+            <div className="muted" style={{ fontSize: 13, marginTop: 2 }}>When ON, Pro users without their own key use the platform keys below.</div>
+          </div>
+          <button className={cn("switch", managedAi && "on")} onClick={() => { const v = !managedAi; setManagedAi(v); post({ type: "managed_ai", managed_ai_on: v }); }}><span className="switch-knob" /></button>
+        </div>
+        <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+          <input className="field-input" value={newKey} onChange={(e) => setNewKey(e.target.value)} placeholder="Add a platform Gemini key (AIza…)" />
+          <button className="btn btn-primary btn-sm" onClick={async () => { if (!newKey.trim()) return; await post({ type: "platform_key_add", key: newKey.trim() }, true); setNewKey(""); }}>Add</button>
+        </div>
+        <div style={{ marginTop: 12 }}>
+          {platKeys.length === 0 ? <p className="empty">No platform keys yet.</p> : platKeys.map((k) => (
+            <div key={k.id} className="key-row">
+              <div><span className="mono">•••• {k.hint || "••••"}</span> <span className={cn("badge", k.status === "active" ? "badge-ok" : "badge-off")}>{k.status}</span></div>
+              <button className="icon-btn" onClick={() => post({ type: "platform_key_del", id: k.id }, true)}>✕</button>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* feature flags */}
