@@ -21,11 +21,13 @@ export const site = {
   nav: [
     { label: "How it works", href: "/how-it-works" },
     { label: "Pricing", href: "/pricing" },
+    { label: "Docs", href: "/docs" },
     { label: "FAQ", href: "/faq" },
   ],
   legalNav: [
     { label: "Privacy", href: "/privacy" },
     { label: "Terms", href: "/terms" },
+    { label: "Contact", href: "/contact" },
   ],
 };
 
