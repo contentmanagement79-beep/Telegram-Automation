@@ -19,6 +19,7 @@ export default function PricingPage() {
   const [user, setUser] = useState<User | null>(null);
   const [mon, setMon] = useState(false);
   const [managedAi, setManagedAi] = useState(false);
+  const [managedVoice, setManagedVoice] = useState(false);
   const [price, setPrice] = useState("");
   const [flags, setFlags] = useState<{ key: string; tier: string }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,12 +28,13 @@ export default function PricingPage() {
     (async () => {
       const [{ data: u }, s, f] = await Promise.all([
         supabase.auth.getUser(),
-        supabase.from("platform_settings").select("monetization_on,price_text,managed_ai_on").eq("id", 1).maybeSingle(),
+        supabase.from("platform_settings").select("monetization_on,price_text,managed_ai_on,managed_voice_on").eq("id", 1).maybeSingle(),
         supabase.from("feature_flags").select("key,tier"),
       ]);
       setUser(u.user);
       setMon(s.data?.monetization_on ?? false);
       setManagedAi(s.data?.managed_ai_on ?? false);
+      setManagedVoice(s.data?.managed_voice_on ?? false);
       setPrice(s.data?.price_text ?? "");
       setFlags(f.data ?? []);
       setLoading(false);
@@ -77,6 +79,7 @@ export default function PricingPage() {
             <p className="tier-blurb">Everything in Free, plus the Pro features.</p>
             <ul className="tier-list">
               {managedAi && <li className="tier-li pop"><CheckCircle2 size={18} /> AI key included — no Gemini key needed</li>}
+              {managedVoice && <li className="tier-li pop"><CheckCircle2 size={18} /> Premium voice included</li>}
               {(proFeatures.length ? proFeatures : ["All premium features"]).map((f) => (
                 <li key={f} className="tier-li pop"><CheckCircle2 size={18} /> {f}</li>
               ))}
