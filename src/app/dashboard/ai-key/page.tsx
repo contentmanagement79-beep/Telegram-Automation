@@ -12,6 +12,7 @@ type Key = { id: string; hint: string | null; status: string; created_at: string
 export default function AiKeyPage() {
   const [keys, setKeys] = useState<Key[]>([]);
   const [loading, setLoading] = useState(true);
+  const [managed, setManaged] = useState(false);
   const [key, setKey] = useState("");
   const [saving, setSaving] = useState(false);
   const [note, setNote] = useState<{ ok: boolean; msg: string } | null>(null);
@@ -20,8 +21,14 @@ export default function AiKeyPage() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const { data } = await supabase.from("ai_keys").select("id,hint,status,created_at").eq("user_id", user.id).order("created_at", { ascending: false });
-    setKeys((data as Key[]) ?? []);
+    const [k, s, p] = await Promise.all([
+      supabase.from("ai_keys").select("id,hint,status,created_at").eq("user_id", user.id).order("created_at", { ascending: false }),
+      supabase.from("platform_settings").select("managed_ai_on").eq("id", 1).maybeSingle(),
+      supabase.from("plans").select("plan,expires_at,suspended").eq("user_id", user.id).maybeSingle(),
+    ]);
+    setKeys((k.data as Key[]) ?? []);
+    const isPro = !!p.data && !p.data.suspended && p.data.plan === "pro" && (!p.data.expires_at || new Date(p.data.expires_at) > new Date());
+    setManaged(!!s.data?.managed_ai_on && isPro);
     setLoading(false);
   }
   useEffect(() => { load(); }, []);
@@ -47,6 +54,14 @@ export default function AiKeyPage() {
       <Link href="/dashboard" className="back-link"><ChevronLeft size={16} /> Back to dashboard</Link>
       <h1 className="dash-title">AI keys</h1>
       <p className="muted" style={{ marginTop: 8 }}>Add one or more Gemini keys — free at aistudio.google.com/apikey. If one hits its limit, the bot uses the next.</p>
+
+      {managed && (
+        <div className="panel glass" style={{ marginTop: 20, borderColor: "var(--mint)" }}>
+          <p style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span className="dot" style={{ background: "var(--mint)" }} /> <strong>Pro:</strong> a platform AI key is active for you — you don&apos;t need your own. Add your own below only if you prefer to use it instead.
+          </p>
+        </div>
+      )}
 
       <div className="panel glass" style={{ marginTop: 32 }}>
         <p className="panel-title">Add a key</p>
