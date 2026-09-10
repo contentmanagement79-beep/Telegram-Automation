@@ -439,3 +439,12 @@ img { max-width: 100%; display: block; }
   border-radius: 10px; font-size: 12.5px; line-height: 1.55;
   font-family: ui-monospace, "SF Mono", Menlo, monospace; white-space: pre;
 }
+
+/* ── Docs warning box ── */
+.doc-warn {
+  margin-top: 18px; padding: 16px;
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 12px;
+}
+.doc-warn p { font-size: 14px; line-height: 1.6; }
